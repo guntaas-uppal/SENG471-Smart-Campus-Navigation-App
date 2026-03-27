@@ -1,0 +1,29 @@
+{
+  "name": "smart-campus-nav",
+  "version": "1.0.0",
+  "description": "UCalgary Smart Campus Navigation App — SENG 471 Group 1 Assignment 4",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext js,jsx"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "vite": "^5.4.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["campus", "navigation", "ucalgary", "react", "leaflet", "seng471"],
+  "author": "SENG 471 Group 1",
+  "license": "MIT"
+}
