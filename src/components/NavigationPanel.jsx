@@ -1,5 +1,7 @@
-// SCNA-08, SCNA-09, SCNA-13: Step-by-step navigation mock panel.
-// User selects origin and destination; app shows mock directions and draws route on map.
+// SCNA-08: Step-by-step navigation mock panel
+// SCNA-09: Triggers route polyline on map via onRouteChange prop
+// User selects origin + destination; app draws route and shows directions list.
+
 import { useState } from 'react'
 import { mockRoutes } from '../data/buildings'
 
@@ -7,26 +9,27 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
   const [origin, setOrigin] = useState('')
   const [destination, setDestination] = useState('')
   const [steps, setSteps] = useState([])
-  const [routeKey, setRouteKey] = useState(null)
   const [noRoute, setNoRoute] = useState(false)
 
   function handleNavigate() {
     if (!origin || !destination || origin === destination) return
 
-    // Try both directions for the route key
+    // Look up pre-defined route in both directions
     const key1 = `${origin}-${destination}`
     const key2 = `${destination}-${origin}`
     const routeData = mockRoutes[key1] || mockRoutes[key2]
 
     if (routeData) {
       const waypoints = accessibilityMode ? routeData.accessible : routeData.standard
-      const dirSteps = accessibilityMode ? routeData.steps.accessible : routeData.steps.standard
+      const dirSteps = accessibilityMode
+        ? routeData.steps.accessible
+        : routeData.steps.standard
       setSteps(dirSteps)
-      setRouteKey(key1)
       setNoRoute(false)
+      // Pass waypoints up to App → CampusMap to draw polyline (SCNA-09)
       onRouteChange(waypoints)
     } else {
-      // No pre-defined route: generate generic steps
+      // Generic directions for pairs without a pre-mapped route
       const o = buildings.find(b => b.id === origin)
       const d = buildings.find(b => b.id === destination)
       const genericSteps = accessibilityMode
@@ -34,7 +37,7 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
             `Exit ${o.name} via the accessible entrance.`,
             'Follow the accessible campus path toward your destination.',
             `Arrive at ${d.name} via the accessible entrance.`,
-            'Estimated time: varies. Check accessible entrance signs.',
+            'Estimated time: varies. Check accessible entrance signs on campus.',
           ]
         : [
             `Exit ${o.name} main entrance.`,
@@ -44,7 +47,7 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
           ]
       setSteps(genericSteps)
       setNoRoute(true)
-      onRouteChange([])
+      onRouteChange([]) // No pre-mapped waypoints for this pair
     }
   }
 
@@ -52,9 +55,8 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
     setOrigin('')
     setDestination('')
     setSteps([])
-    setRouteKey(null)
     setNoRoute(false)
-    onRouteChange([])
+    onRouteChange([]) // Clear polyline from map
   }
 
   return (
@@ -71,7 +73,9 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
           >
             <option value="">Select starting building...</option>
             {buildings.map(b => (
-              <option key={b.id} value={b.id}>{b.code} — {b.name}</option>
+              <option key={b.id} value={b.id}>
+                {b.code} — {b.name}
+              </option>
             ))}
           </select>
         </div>
@@ -85,14 +89,18 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
           >
             <option value="">Select destination...</option>
             {buildings.map(b => (
-              <option key={b.id} value={b.id}>{b.code} — {b.name}</option>
+              <option key={b.id} value={b.id}>
+                {b.code} — {b.name}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
       {accessibilityMode && (
-        <div className="acc-nav-note">♿ Accessibility mode on — accessible routes will be shown</div>
+        <div className="acc-nav-note">
+          ♿ Accessibility mode on — accessible routes will be shown
+        </div>
       )}
 
       <div className="nav-buttons">
@@ -104,7 +112,9 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
           Get Directions
         </button>
         {steps.length > 0 && (
-          <button className="btn btn-ghost" onClick={handleClear}>Clear</button>
+          <button className="btn btn-ghost" onClick={handleClear}>
+            Clear
+          </button>
         )}
       </div>
 
