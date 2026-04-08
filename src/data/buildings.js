@@ -1,449 +1,321 @@
-// SCNA-04: Mock building data
-// SCNA-16: transitStops export — nearby bus and CTrain stops
+// src/data/buildings.js
+// ─────────────────────────────────────────────────────────────────────────────
+// SCRUM-20: Complete buildings.js Data
+//   Adds: mapX, mapY, width, height, color (SVG positioning)
+//         classrooms[] array per building (id, name, type, floor, capacity)
+//         accessibility{} sub-object (elevator, ramp, accessibleWashroom,
+//           accessibleWashroomFloor, accessibleEntrance, accessibleRoute)
+//   Also adds named exports: transitStops, mockRoutes
+//   (used by CampusMap and NavigationPanel)
+// ─────────────────────────────────────────────────────────────────────────────
 
-// ---------------------------------------------------------------------------
-// TRANSIT STOPS (SCNA-16)
-// ---------------------------------------------------------------------------
-export const transitStops = [
-  {
-    id: 'ts-1',
-    name: 'University Station (CTrain)',
-    routes: ['Red Line'],
-    mapX: 120,
-    mapY: 390,
-  },
-  {
-    id: 'ts-2',
-    name: 'Bus Stop – University Dr NW',
-    routes: ['Route 9', 'Route 19'],
-    mapX: 90,
-    mapY: 290,
-  },
-  {
-    id: 'ts-3',
-    name: 'Bus Stop – 24 Ave NW',
-    routes: ['Route 20', 'Route 403'],
-    mapX: 540,
-    mapY: 380,
-  },
-]
-
-// ---------------------------------------------------------------------------
-// MOCK NAVIGATION ROUTES (SCNA-08, SCNA-09)
-// Each key is "originId-destinationId". Both directions are tried at lookup.
-// standard  = normal walking waypoints + steps
-// accessible = accessible-route waypoints + steps (used when accessibilityMode on)
-// ---------------------------------------------------------------------------
-export const mockRoutes = {
-  'ict-ms': {
-    standard: [
-      { x: 345, y: 210 },
-      { x: 390, y: 210 },
-      { x: 430, y: 187 },
-    ],
-    accessible: [
-      { x: 345, y: 210 },
-      { x: 390, y: 225 },
-      { x: 415, y: 225 },
-      { x: 430, y: 200 },
-    ],
-    steps: {
-      standard: [
-        'Exit ICT through the main west entrance.',
-        'Walk east along the Science walkway (~2 min).',
-        'Enter Mathematical Sciences building.',
-        'Estimated total: 4 minutes walking.',
-      ],
-      accessible: [
-        'Exit ICT through the accessible west entrance (automatic doors).',
-        'Follow the paved accessible path heading east.',
-        'Enter MS via the east accessible entrance (elevator available inside).',
-        'Estimated total: 5 minutes, fully accessible route.',
-      ],
-    },
-  },
-  'ict-tfdl': {
-    standard: [
-      { x: 345, y: 210 },
-      { x: 345, y: 280 },
-      { x: 330, y: 327 },
-    ],
-    accessible: [
-      { x: 345, y: 210 },
-      { x: 340, y: 260 },
-      { x: 330, y: 295 },
-      { x: 330, y: 327 },
-    ],
-    steps: {
-      standard: [
-        'Exit ICT south entrance.',
-        'Walk south through the main plaza.',
-        'Enter TFDL from the east entrance.',
-        'Estimated total: 5 minutes walking.',
-      ],
-      accessible: [
-        'Exit ICT accessible south entrance.',
-        'Follow paved path through the main plaza.',
-        'Enter TFDL via the accessible east entrance with automatic doors.',
-        'Estimated total: 6 minutes, fully accessible route.',
-      ],
-    },
-  },
-  'msc-ict': {
-    standard: [
-      { x: 255, y: 200 },
-      { x: 280, y: 200 },
-      { x: 300, y: 210 },
-    ],
-    accessible: [
-      { x: 255, y: 200 },
-      { x: 280, y: 215 },
-      { x: 300, y: 215 },
-      { x: 300, y: 210 },
-    ],
-    steps: {
-      standard: [
-        'Exit MacEwan Student Centre east entrance.',
-        'Walk east along the main walkway.',
-        'Enter ICT through the main entrance.',
-        'Estimated total: 3 minutes walking.',
-      ],
-      accessible: [
-        'Exit MSC accessible east entrance (automatic doors).',
-        'Follow the paved accessible path eastward.',
-        'Enter ICT via the west accessible entrance (automatic doors).',
-        'Estimated total: 4 minutes, fully accessible route.',
-      ],
-    },
-  },
-  'edc-st': {
-    standard: [
-      { x: 240, y: 287 },
-      { x: 340, y: 287 },
-      { x: 430, y: 285 },
-    ],
-    accessible: [
-      { x: 240, y: 287 },
-      { x: 310, y: 295 },
-      { x: 400, y: 295 },
-      { x: 430, y: 285 },
-    ],
-    steps: {
-      standard: [
-        'Exit EDC north entrance.',
-        'Walk east along the south campus walkway.',
-        'Enter Science Theatre from the west side.',
-        'Estimated total: 6 minutes walking.',
-      ],
-      accessible: [
-        'Exit EDC north accessible entrance (ramp).',
-        'Follow the paved path east along south campus.',
-        'Enter ST via the south ramp entrance.',
-        'Estimated total: 7 minutes, fully accessible route.',
-      ],
-    },
-  },
-}
-
-// ---------------------------------------------------------------------------
-// BUILDINGS (SCNA-04)
-// ---------------------------------------------------------------------------
 const buildings = [
   {
-    id: 'ict',
-    name: 'Information and Communications Technology',
-    code: 'ICT',
-    type: 'Academic',
-    description:
-      'Home of the Department of Computer Science and Software Engineering. ' +
-      'Contains teaching labs, lecture rooms, and faculty offices.',
-    hours:
-      'Mon–Fri: 7:30 AM – 10:00 PM\nSat: 9:00 AM – 5:00 PM\nSun: Closed',
+    id: "ict",
+    name: "Information and Communications Technology",
+    code: "ICT",
+    lat: 51.0779, lng: -114.1370,
+    // SVG map position (620×430 viewport)
+    mapX: 80,  mapY: 150,  width: 90,  height: 60,
+    color: "#2563eb",
     floors: 5,
-    mapX: 300, mapY: 180, width: 90, height: 60,
-    color: '#3b82f6',
+    hours: "Mon-Fri 7:30am-10pm",
+    type: "Academic",
+    description: "Home of CS and SENG departments.",
+    // Flat flags kept for backward compat
+    hasElevator: true, hasRamp: true, hasAccessibleWashroom: true,
+    // Structured sub-object used by BuildingPanel & CampusMap
     accessibility: {
-      elevator: true,
-      ramp: true,
-      accessibleWashroom: true,
-      accessibleEntrance: 'Main entrance on west side, automatic doors.',
-      accessibleRoute:
-        'Take the elevator in the main lobby to any floor. ' +
-        'Accessible washrooms on floors 1, 3, and 5.',
+      elevator: true, ramp: true,
+      accessibleWashroom: true, accessibleWashroomFloor: 1,
+      accessibleEntrance: "South entrance, Level 1",
+      accessibleRoute: "Use south ramp from Ring Road path",
     },
     classrooms: [
-      { id: 'ict-101', name: 'ICT 101', type: 'Lecture Hall',  capacity: 120, floor: 1 },
-      { id: 'ict-102', name: 'ICT 102', type: 'Seminar Room',  capacity: 40,  floor: 1 },
-      { id: 'ict-201', name: 'ICT 201', type: 'Computer Lab',  capacity: 30,  floor: 2 },
-      { id: 'ict-301', name: 'ICT 301', type: 'Lecture Room',  capacity: 60,  floor: 3 },
-      { id: 'ict-401', name: 'ICT 401', type: 'Research Lab',  capacity: 20,  floor: 4 },
+      { id: "ict-116", name: "ICT 116", type: "Lecture", floor: 1, capacity: 60 },
+      { id: "ict-121", name: "ICT 121", type: "Lab",     floor: 1, capacity: 30 },
+      { id: "ict-316", name: "ICT 316", type: "Seminar", floor: 3, capacity: 25 },
+      { id: "ict-416", name: "ICT 416", type: "Lecture", floor: 4, capacity: 80 },
     ],
-    floorPlan: {
-      1: [
-        { label: 'ICT 101',    x: 30,  y: 30, w: 110, h: 55, type: 'lecture'  },
-        { label: 'ICT 102',    x: 160, y: 30, w: 80,  h: 55, type: 'seminar'  },
-        { label: 'Washroom',   x: 260, y: 30, w: 70,  h: 55, type: 'washroom' },
-        { label: 'Elevator',   x: 350, y: 30, w: 50,  h: 55, type: 'elevator' },
-        { label: 'Main Lobby', x: 30,  y: 105, w: 370, h: 50, type: 'common'  },
-      ],
-      2: [
-        { label: 'ICT 201 Lab', x: 30,  y: 30, w: 140, h: 55, type: 'lab'      },
-        { label: 'ICT 202',     x: 190, y: 30, w: 100, h: 55, type: 'seminar'  },
-        { label: 'Elevator',    x: 310, y: 30, w: 50,  h: 55, type: 'elevator' },
-        { label: 'Washroom',    x: 375, y: 30, w: 55,  h: 55, type: 'washroom' },
-        { label: 'Study Area',  x: 30,  y: 105, w: 200, h: 50, type: 'common'  },
-      ],
-      3: [
-        { label: 'ICT 301',       x: 30,  y: 30, w: 120, h: 55, type: 'lecture'  },
-        { label: 'ICT 302',       x: 170, y: 30, w: 100, h: 55, type: 'seminar'  },
-        { label: 'Accessible WR', x: 290, y: 30, w: 80,  h: 55, type: 'washroom' },
-        { label: 'Elevator',      x: 390, y: 30, w: 40,  h: 55, type: 'elevator' },
-      ],
-      4: [
-        { label: 'ICT 401 Research', x: 30,  y: 30, w: 150, h: 55, type: 'lab'     },
-        { label: 'ICT 402',          x: 200, y: 30, w: 100, h: 55, type: 'office'  },
-        { label: 'Elevator',         x: 320, y: 30, w: 50,  h: 55, type: 'elevator'},
-      ],
-      5: [
-        { label: 'Faculty Offices', x: 30,  y: 30, w: 200, h: 55, type: 'office'  },
-        { label: 'Accessible WR',   x: 250, y: 30, w: 80,  h: 55, type: 'washroom'},
-        { label: 'Elevator',        x: 350, y: 30, w: 50,  h: 55, type: 'elevator'},
-      ],
-    },
   },
   {
-    id: 'ms',
-    name: 'Mathematical Sciences',
-    code: 'MS',
-    type: 'Academic',
-    description:
-      'Houses the Department of Mathematics and Statistics. Features lecture ' +
-      'theatres, faculty offices, and student study lounges.',
-    hours: 'Mon–Fri: 8:00 AM – 8:00 PM\nSat–Sun: Closed',
+    id: "ms",
+    name: "Mathematical Sciences",
+    code: "MS",
+    lat: 51.0790, lng: -114.1350,
+    mapX: 210, mapY: 150, width: 80, height: 60,
+    color: "#7c3aed",
     floors: 4,
-    mapX: 430, mapY: 160, width: 75, height: 55,
-    color: '#8b5cf6',
+    hours: "Mon-Fri 8am-8pm",
+    type: "Academic",
+    description: "Mathematics and Statistics.",
+    hasElevator: true, hasRamp: false, hasAccessibleWashroom: true,
     accessibility: {
-      elevator: true,
-      ramp: false,
-      accessibleWashroom: true,
-      accessibleEntrance: 'East entrance via the connector hallway from ICT.',
-      accessibleRoute:
-        'Elevator located near the east entrance. ' +
-        'Accessible washrooms on floors 1 and 3.',
+      elevator: true, ramp: false,
+      accessibleWashroom: true, accessibleWashroomFloor: 2,
+      accessibleEntrance: "Main entrance, Level 1 (no ramp — use ICT tunnel)",
+      accessibleRoute: "Cross via ICT-MS indoor connector on floor 1",
     },
     classrooms: [
-      { id: 'ms-110', name: 'MS 110', type: 'Lecture Theatre', capacity: 200, floor: 1 },
-      { id: 'ms-211', name: 'MS 211', type: 'Tutorial Room',   capacity: 35,  floor: 2 },
-      { id: 'ms-325', name: 'MS 325', type: 'Seminar Room',    capacity: 30,  floor: 3 },
+      { id: "ms-160", name: "MS 160", type: "Lecture",  floor: 1, capacity: 100 },
+      { id: "ms-271", name: "MS 271", type: "Seminar",  floor: 2, capacity: 30  },
+      { id: "ms-319", name: "MS 319", type: "Tutorial", floor: 3, capacity: 20  },
     ],
-    floorPlan: {
-      1: [
-        { label: 'MS 110 Theatre', x: 30,  y: 30, w: 160, h: 70, type: 'lecture'  },
-        { label: 'Washroom',       x: 210, y: 30, w: 70,  h: 70, type: 'washroom' },
-        { label: 'Elevator',       x: 300, y: 30, w: 50,  h: 70, type: 'elevator' },
-        { label: 'Info Desk',      x: 30,  y: 120, w: 120, h: 40, type: 'common'  },
-      ],
-      2: [
-        { label: 'MS 211',  x: 30,  y: 30, w: 110, h: 55, type: 'seminar'  },
-        { label: 'MS 212',  x: 160, y: 30, w: 110, h: 55, type: 'seminar'  },
-        { label: 'Elevator',x: 290, y: 30, w: 50,  h: 55, type: 'elevator' },
-      ],
-      3: [
-        { label: 'MS 325',        x: 30,  y: 30, w: 120, h: 55, type: 'seminar'  },
-        { label: 'Accessible WR', x: 170, y: 30, w: 80,  h: 55, type: 'washroom' },
-        { label: 'Elevator',      x: 270, y: 30, w: 50,  h: 55, type: 'elevator' },
-      ],
-      4: [
-        { label: 'Faculty Offices', x: 30,  y: 30, w: 190, h: 55, type: 'office'  },
-        { label: 'Elevator',        x: 240, y: 30, w: 50,  h: 55, type: 'elevator'},
-      ],
-    },
   },
   {
-    id: 'st',
-    name: 'Science Theatre',
-    code: 'ST',
-    type: 'Lecture',
-    description:
-      'A large auditorium-style lecture complex. Hosts introductory science ' +
-      'courses with seating for hundreds of students.',
-    hours: 'Mon–Fri: 8:00 AM – 9:00 PM\nSat: 10:00 AM – 4:00 PM\nSun: Closed',
+    id: "st",
+    name: "Science Theatre",
+    code: "ST",
+    lat: 51.0802, lng: -114.1340,
+    mapX: 330, mapY: 150, width: 80, height: 55,
+    color: "#0891b2",
     floors: 2,
-    mapX: 430, mapY: 260, width: 85, height: 50,
-    color: '#10b981',
+    hours: "Mon-Fri 8am-9pm",
+    type: "Lecture",
+    description: "Large lecture theatres.",
+    hasElevator: false, hasRamp: true, hasAccessibleWashroom: true,
     accessibility: {
-      elevator: false,
-      ramp: true,
-      accessibleWashroom: true,
-      accessibleEntrance: 'Ramp on the south side of the building.',
-      accessibleRoute:
-        'No elevator. Accessible seating on ground level of all theatres. ' +
-        'Accessible washrooms on floor 1.',
+      elevator: false, ramp: true,
+      accessibleWashroom: true, accessibleWashroomFloor: 1,
+      accessibleEntrance: "West ramp entrance from main walkway",
+      accessibleRoute: "West side path from MacEwan walkway",
     },
     classrooms: [
-      { id: 'st-140', name: 'ST 140', type: 'Theatre', capacity: 500, floor: 1 },
-      { id: 'st-148', name: 'ST 148', type: 'Theatre', capacity: 300, floor: 1 },
-      { id: 'st-241', name: 'ST 241', type: 'Theatre', capacity: 200, floor: 2 },
+      { id: "st-140", name: "ST 140", type: "Theatre", floor: 1, capacity: 500 },
+      { id: "st-141", name: "ST 141", type: "Theatre", floor: 1, capacity: 500 },
+      { id: "st-148", name: "ST 148", type: "Lecture",  floor: 1, capacity: 200 },
     ],
-    floorPlan: {
-      1: [
-        { label: 'ST 140',        x: 30,  y: 30, w: 150, h: 80, type: 'lecture'  },
-        { label: 'ST 148',        x: 200, y: 30, w: 130, h: 80, type: 'lecture'  },
-        { label: 'Accessible WR', x: 350, y: 30, w: 80,  h: 80, type: 'washroom' },
-        { label: 'Ramp Entry',    x: 30,  y: 130, w: 90, h: 35, type: 'common'  },
-      ],
-      2: [
-        { label: 'ST 241',   x: 30,  y: 30, w: 200, h: 80, type: 'lecture'  },
-        { label: 'Washroom', x: 250, y: 30, w: 80,  h: 80, type: 'washroom' },
-      ],
-    },
   },
   {
-    id: 'edc',
-    name: 'Engineering Design Centre',
-    code: 'EDC',
-    type: 'Lab / Design',
-    description:
-      'Engineering innovation hub with machine shops, design studios, and ' +
-      'prototyping labs. Home to capstone projects and student design teams.',
-    hours:
-      'Mon–Fri: 7:00 AM – 11:00 PM\nSat: 9:00 AM – 6:00 PM\nSun: 12:00 PM – 6:00 PM',
+    id: "edc",
+    name: "Engineering Design Centre",
+    code: "EDC",
+    lat: 51.0774, lng: -114.1305,
+    mapX: 450, mapY: 240, width: 90, height: 65,
+    color: "#d97706",
     floors: 3,
-    mapX: 160, mapY: 260, width: 80, height: 55,
-    color: '#f59e0b',
+    hours: "Mon-Fri 7am-11pm",
+    type: "Lab/Design",
+    description: "Engineering design and prototyping labs.",
+    hasElevator: true, hasRamp: true, hasAccessibleWashroom: true,
     accessibility: {
-      elevator: true,
-      ramp: true,
-      accessibleWashroom: true,
-      accessibleEntrance: 'Main north entrance has automatic sliding doors and a ramp.',
-      accessibleRoute: 'Elevator in central atrium. Accessible washrooms on all floors.',
+      elevator: true, ramp: true,
+      accessibleWashroom: true, accessibleWashroomFloor: 1,
+      accessibleEntrance: "North entrance with automatic doors",
+      accessibleRoute: "Paved accessible path from Engineering Quad",
     },
     classrooms: [
-      { id: 'edc-101', name: 'EDC 101', type: 'Design Studio', capacity: 50, floor: 1 },
-      { id: 'edc-201', name: 'EDC 201', type: 'Machine Shop',  capacity: 25, floor: 2 },
-      { id: 'edc-301', name: 'EDC 301', type: 'Capstone Lab',  capacity: 40, floor: 3 },
+      { id: "edc-180", name: "EDC 180", type: "Workshop",     floor: 1, capacity: 20 },
+      { id: "edc-280", name: "EDC 280", type: "Design Lab",   floor: 2, capacity: 40 },
+      { id: "edc-380", name: "EDC 380", type: "Project Room", floor: 3, capacity: 15 },
     ],
-    floorPlan: {
-      1: [
-        { label: 'EDC 101 Studio', x: 30,  y: 30, w: 140, h: 60, type: 'lab'      },
-        { label: 'Accessible WR',  x: 190, y: 30, w: 80,  h: 60, type: 'washroom' },
-        { label: 'Elevator',       x: 290, y: 30, w: 50,  h: 60, type: 'elevator' },
-        { label: 'Ramp Entry',     x: 360, y: 30, w: 70,  h: 60, type: 'common'   },
-      ],
-      2: [
-        { label: 'Machine Shop',  x: 30,  y: 30, w: 150, h: 60, type: 'lab'      },
-        { label: 'EDC 202',       x: 200, y: 30, w: 100, h: 60, type: 'seminar'  },
-        { label: 'Accessible WR', x: 320, y: 30, w: 80,  h: 60, type: 'washroom' },
-        { label: 'Elevator',      x: 420, y: 30, w: 50,  h: 60, type: 'elevator' },
-      ],
-      3: [
-        { label: 'Capstone Lab',  x: 30,  y: 30, w: 170, h: 60, type: 'lab'     },
-        { label: 'Conference Rm', x: 220, y: 30, w: 110, h: 60, type: 'seminar' },
-        { label: 'Elevator',      x: 350, y: 30, w: 50,  h: 60, type: 'elevator'},
-      ],
-    },
   },
   {
-    id: 'tfdl',
-    name: 'Taylor Family Digital Library',
-    code: 'TFDL',
-    type: 'Library',
-    description:
-      'The main campus library with 5 floors of study spaces, digital resources, ' +
-      'research assistance desks, and quiet study zones.',
-    hours:
-      'Mon–Thu: 8:00 AM – 12:00 AM\nFri: 8:00 AM – 8:00 PM\nSat–Sun: 10:00 AM – 8:00 PM',
+    id: "lib",
+    name: "Taylor Family Digital Library",
+    code: "TFDL",
+    lat: 51.0784, lng: -114.1295,
+    mapX: 450, mapY: 145, width: 90, height: 65,
+    color: "#059669",
     floors: 5,
-    mapX: 280, mapY: 295, width: 100, height: 65,
-    color: '#ef4444',
+    hours: "Mon-Fri 8am-midnight",
+    type: "Library",
+    description: "Main campus library with study spaces.",
+    hasElevator: true, hasRamp: true, hasAccessibleWashroom: true,
     accessibility: {
-      elevator: true,
-      ramp: true,
-      accessibleWashroom: true,
-      accessibleEntrance: 'Main east entrance with automatic doors and level access.',
-      accessibleRoute:
-        'Two elevators available. Accessible study carrels on every floor. ' +
-        'Accessible washrooms on floors 1, 3, and 5.',
+      elevator: true, ramp: true,
+      accessibleWashroom: true, accessibleWashroomFloor: 1,
+      accessibleEntrance: "Main south entrance, fully accessible",
+      accessibleRoute: "Central campus path directly to south entrance",
     },
     classrooms: [
-      { id: 'tfdl-120', name: 'TFDL 120', type: 'Group Study Room', capacity: 8,  floor: 1 },
-      { id: 'tfdl-220', name: 'TFDL 220', type: 'Quiet Study Zone', capacity: 60, floor: 2 },
-      { id: 'tfdl-320', name: 'TFDL 320', type: 'Research Desk',    capacity: 10, floor: 3 },
+      { id: "tfdl-study-1", name: "Study Room 1",    type: "Study Room", floor: 2, capacity: 8  },
+      { id: "tfdl-study-2", name: "Study Room 2",    type: "Study Room", floor: 3, capacity: 8  },
+      { id: "tfdl-lab-1",   name: "Digital Media Lab", type: "Lab",      floor: 4, capacity: 20 },
     ],
-    floorPlan: {
-      1: [
-        { label: 'Information Desk', x: 30,  y: 30, w: 130, h: 55, type: 'common'   },
-        { label: 'Group Study 120',  x: 180, y: 30, w: 110, h: 55, type: 'seminar'  },
-        { label: 'Accessible WR',    x: 310, y: 30, w: 80,  h: 55, type: 'washroom' },
-        { label: 'Elevator',         x: 410, y: 30, w: 50,  h: 55, type: 'elevator' },
-      ],
-      2: [
-        { label: 'Quiet Study Zone', x: 30,  y: 30, w: 200, h: 55, type: 'common'   },
-        { label: 'Washroom',         x: 250, y: 30, w: 80,  h: 55, type: 'washroom' },
-        { label: 'Elevator',         x: 350, y: 30, w: 50,  h: 55, type: 'elevator' },
-      ],
-      3: [
-        { label: 'Research Desk',  x: 30,  y: 30, w: 130, h: 55, type: 'common'   },
-        { label: 'Study Carrels',  x: 180, y: 30, w: 120, h: 55, type: 'common'   },
-        { label: 'Accessible WR',  x: 320, y: 30, w: 80,  h: 55, type: 'washroom' },
-        { label: 'Elevator',       x: 420, y: 30, w: 50,  h: 55, type: 'elevator' },
-      ],
-      4: [
-        { label: 'Special Collections', x: 30,  y: 30, w: 160, h: 55, type: 'office'  },
-        { label: 'Washroom',            x: 210, y: 30, w: 80,  h: 55, type: 'washroom'},
-        { label: 'Elevator',            x: 310, y: 30, w: 50,  h: 55, type: 'elevator'},
-      ],
-      5: [
-        { label: 'Digital Scholarship', x: 30,  y: 30, w: 160, h: 55, type: 'lab'     },
-        { label: 'Accessible WR',       x: 210, y: 30, w: 80,  h: 55, type: 'washroom'},
-        { label: 'Elevator',            x: 310, y: 30, w: 50,  h: 55, type: 'elevator'},
-      ],
-    },
   },
   {
-    id: 'msc',
-    name: 'MacEwan Student Centre',
-    code: 'MSC',
-    type: 'Student Services',
-    description:
-      'Student hub with the food court, SU offices, lounges, the bookstore, ' +
-      'and various student services.',
-    hours: 'Mon–Fri: 7:00 AM – 10:00 PM\nSat–Sun: 10:00 AM – 6:00 PM',
-    floors: 3,
-    mapX: 160, mapY: 170, width: 95, height: 60,
-    color: '#06b6d4',
+    id: "mac",
+    name: "MacEwan Student Centre",
+    code: "MSC",
+    lat: 51.0771, lng: -114.1315,
+    mapX: 210, mapY: 280, width: 100, height: 60,
+    color: "#dc2626",
+    floors: 2,
+    hours: "Mon-Fri 7am-10pm",
+    type: "Student Services",
+    description: "Student services and food court.",
+    hasElevator: true, hasRamp: true, hasAccessibleWashroom: true,
     accessibility: {
-      elevator: true,
-      ramp: true,
-      accessibleWashroom: true,
-      accessibleEntrance: 'All entrances are accessible with automatic doors.',
-      accessibleRoute: 'Elevator near the south entrance. Accessible washrooms on all floors.',
+      elevator: true, ramp: true,
+      accessibleWashroom: true, accessibleWashroomFloor: 1,
+      accessibleEntrance: "All entrances are accessible",
+      accessibleRoute: "Central campus hub — accessible from all directions",
     },
     classrooms: [
-      { id: 'msc-g01', name: 'MSC G01', type: 'Meeting Room', capacity: 20,  floor: 1 },
-      { id: 'msc-201', name: 'MSC 201', type: 'Event Space',  capacity: 100, floor: 2 },
+      { id: "msc-dining",    name: "Food Court", type: "Dining", floor: 1, capacity: 200 },
+      { id: "msc-bookstore", name: "Bookstore",  type: "Retail", floor: 1, capacity: 50  },
     ],
-    floorPlan: {
-      1: [
-        { label: 'Food Court',   x: 30,  y: 30, w: 180, h: 65, type: 'common'   },
-        { label: 'Bookstore',    x: 230, y: 30, w: 110, h: 65, type: 'common'   },
-        { label: 'Accessible WR',x: 360, y: 30, w: 70,  h: 65, type: 'washroom' },
-        { label: 'Elevator',     x: 450, y: 30, w: 50,  h: 65, type: 'elevator' },
+  },
+  {
+    id: "bio",
+    name: "Biological Sciences",
+    code: "BI",
+    lat: 51.0808, lng: -114.1355,
+    mapX: 330, mapY: 80, width: 80, height: 55,
+    color: "#16a34a",
+    floors: 4,
+    hours: "Mon-Fri 8am-6pm",
+    type: "Academic/Lab",
+    description: "Life sciences research and classrooms.",
+    hasElevator: true, hasRamp: false, hasAccessibleWashroom: false,
+    accessibility: {
+      elevator: true, ramp: false,
+      accessibleWashroom: false, accessibleWashroomFloor: null,
+      accessibleEntrance: "East elevator entrance (limited ramp access)",
+      accessibleRoute: "Use ST west path then BI east side",
+    },
+    classrooms: [
+      { id: "bi-103", name: "BI 103", type: "Lab",          floor: 1, capacity: 30 },
+      { id: "bi-250", name: "BI 250", type: "Lecture",      floor: 2, capacity: 80 },
+      { id: "bi-367", name: "BI 367", type: "Research Lab", floor: 3, capacity: 20 },
+    ],
+  },
+  {
+    id: "sscp",
+    name: "Social Sciences",
+    code: "SS",
+    lat: 51.0800, lng: -114.1325,
+    mapX: 330, mapY: 240, width: 80, height: 60,
+    color: "#9333ea",
+    floors: 3,
+    hours: "Mon-Fri 8am-7pm",
+    type: "Academic",
+    description: "Social science lectures and offices.",
+    hasElevator: false, hasRamp: true, hasAccessibleWashroom: true,
+    accessibility: {
+      elevator: false, ramp: true,
+      accessibleWashroom: true, accessibleWashroomFloor: 1,
+      accessibleEntrance: "South entrance ramp (ramp only — no elevator)",
+      accessibleRoute: "South campus path to SS south ramp",
+    },
+    classrooms: [
+      { id: "ss-105", name: "SS 105", type: "Seminar", floor: 1, capacity: 30  },
+      { id: "ss-423", name: "SS 423", type: "Lecture", floor: 4, capacity: 120 },
+    ],
+  },
+];
+
+// ── Transit Stops — used by CampusMap (SCRUM-19 will wire the toggle) ─────────
+export const transitStops = [
+  { id: "ts-1", name: "University Station (CTrain)", mapX: 540, mapY: 390, route: "Red Line CTrain"   },
+  { id: "ts-2", name: "Bus Loop (North Gate)",       mapX: 300, mapY: 40,  route: "Routes 9, 72, 300" },
+  { id: "ts-3", name: "MacEwan Stop (West)",         mapX: 80,  mapY: 320, route: "Routes 19, 23, 93" },
+  { id: "ts-4", name: "Engineering Rd Stop",         mapX: 540, mapY: 200, route: "Routes 9, 72"      },
+];
+
+// ── Mock Routes — used by NavigationPanel (SCRUM-27 extends these) ────────────
+export const mockRoutes = {
+  "ict-ms": {
+    standard:   [{ x:125,y:180 },{ x:165,y:180 },{ x:210,y:180 }],
+    accessible: [{ x:125,y:180 },{ x:165,y:200 },{ x:210,y:180 }],
+    steps: {
+      standard:   [
+        "Exit ICT main entrance (south side).",
+        "Turn right on main campus walkway heading east.",
+        "Walk 3 minutes along the central path.",
+        "Arrive at MS main entrance on the north side.",
       ],
-      2: [
-        { label: 'SU Offices',  x: 30,  y: 30, w: 140, h: 55, type: 'office'   },
-        { label: 'Event Space', x: 190, y: 30, w: 140, h: 55, type: 'lecture'  },
-        { label: 'Washroom',    x: 350, y: 30, w: 70,  h: 55, type: 'washroom' },
-        { label: 'Elevator',    x: 440, y: 30, w: 50,  h: 55, type: 'elevator' },
-      ],
-      3: [
-        { label: 'Student Lounge', x: 30,  y: 30, w: 180, h: 55, type: 'common'   },
-        { label: 'Accessible WR',  x: 230, y: 30, w: 80,  h: 55, type: 'washroom' },
-        { label: 'Elevator',       x: 330, y: 30, w: 50,  h: 55, type: 'elevator' },
+      accessible: [
+        "Exit ICT via the south accessible ramp entrance.",
+        "Follow the paved accessible path east toward MS.",
+        "Enter MS via the accessible north entrance (elevator available inside).",
       ],
     },
   },
-]
+  "ict-lib": {
+    standard:   [{ x:125,y:180 },{ x:300,y:180 },{ x:450,y:175 }],
+    accessible: [{ x:125,y:180 },{ x:300,y:200 },{ x:450,y:175 }],
+    steps: {
+      standard:   [
+        "Exit ICT south entrance.",
+        "Follow central campus path east past MS and SS.",
+        "Continue east to TFDL south entrance.",
+        "Estimated walk: 7 minutes.",
+      ],
+      accessible: [
+        "Exit ICT via south accessible ramp.",
+        "Follow the wide accessible path through central campus.",
+        "Arrive at TFDL main south entrance (fully accessible).",
+      ],
+    },
+  },
+  "mac-edc": {
+    standard:   [{ x:260,y:310 },{ x:370,y:310 },{ x:450,y:275 }],
+    accessible: [{ x:260,y:310 },{ x:350,y:310 },{ x:450,y:275 }],
+    steps: {
+      standard:   [
+        "Exit MacEwan Student Centre east entrance.",
+        "Head east along the south campus path.",
+        "Turn north at Engineering Quad.",
+        "Arrive at EDC north entrance.",
+      ],
+      accessible: [
+        "Exit MSC via accessible east entrance.",
+        "Follow accessible south path eastward.",
+        "Use EDC north accessible entrance with automatic doors.",
+      ],
+    },
+  },
+  "ms-st": {
+    standard:   [{ x:250,y:180 },{ x:290,y:180 },{ x:330,y:175 }],
+    accessible: [{ x:250,y:185 },{ x:290,y:185 },{ x:330,y:178 }],
+    steps: {
+      standard:   [
+        "Exit MS east entrance.",
+        "Walk east along central walkway.",
+        "Arrive at ST west entrance.",
+      ],
+      accessible: [
+        "Exit MS accessible entrance.",
+        "Follow wide paved path eastward.",
+        "Arrive at ST via west ramp accessible entrance.",
+      ],
+    },
+  },
+  "st-lib": {
+    standard:   [{ x:370,y:175 },{ x:410,y:175 },{ x:450,y:175 }],
+    accessible: [{ x:375,y:178 },{ x:413,y:178 },{ x:453,y:178 }],
+    steps: {
+      standard:   [
+        "Exit ST east entrance.",
+        "Walk east along the main path.",
+        "Arrive at TFDL south entrance.",
+      ],
+      accessible: [
+        "Exit ST via east accessible ramp.",
+        "Follow the wide path to TFDL.",
+        "Enter TFDL through the fully accessible south entrance.",
+      ],
+    },
+  },
+  "ict-mac": {
+    standard:   [{ x:125,y:180 },{ x:125,y:250 },{ x:210,y:310 }],
+    accessible: [{ x:125,y:182 },{ x:125,y:252 },{ x:215,y:312 }],
+    steps: {
+      standard:   [
+        "Exit ICT south entrance.",
+        "Turn south along west campus path.",
+        "Arrive at MacEwan Student Centre north entrance.",
+        "Estimated walk: 5 minutes.",
+      ],
+      accessible: [
+        "Exit ICT via south ramp.",
+        "Follow accessible path south along the west side.",
+        "Enter MSC via any entrance (all accessible).",
+      ],
+    },
+  },
+};
 
-export default buildings
+export default buildings;
