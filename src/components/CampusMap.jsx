@@ -1,5 +1,6 @@
-// SCNA-02, SCNA-03, SCNA-09, SCNA-16: Mock SVG campus map with building markers,
-// route polyline, and transit stop markers. No real map API used.
+// SCNA-03: SVG campus map with building markers and route polyline
+// SCNA-14: Green/amber accessibility dots on building markers when mode is active
+
 import { transitStops } from '../data/buildings'
 
 const MAP_W = 620
@@ -13,7 +14,6 @@ export default function CampusMap({
   accessibilityMode,
   showTransit,
 }) {
-  // Compute polyline points string from waypoints array
   function pointsString(waypoints) {
     return waypoints.map(p => `${p.x},${p.y}`).join(' ')
   }
@@ -26,19 +26,17 @@ export default function CampusMap({
         height="100%"
         className="campus-svg"
       >
-        {/* Background: campus grounds */}
+        {/* Background */}
         <rect x="0" y="0" width={MAP_W} height={MAP_H} fill="#e8f0e4" rx="8" />
-
-        {/* Green areas / paths */}
         <rect x="60" y="140" width="500" height="180" fill="#d1e8c8" rx="4" opacity="0.5" />
         <rect x="200" y="240" width="220" height="30" fill="#c5dbb9" rx="2" opacity="0.7" />
-        {/* Main campus walkway horizontal */}
         <rect x="60" y="230" width="500" height="10" fill="#c8d8c0" rx="2" />
-        {/* Vertical walkway */}
         <rect x="305" y="140" width="10" height="230" fill="#c8d8c0" rx="2" />
-
-        {/* Road / perimeter */}
-        <rect x="30" y="100" width="560" height="300" fill="none" stroke="#b0c4a8" strokeWidth="2" rx="10" strokeDasharray="6 4" />
+        <rect
+          x="30" y="100" width="560" height="300"
+          fill="none" stroke="#b0c4a8" strokeWidth="2"
+          rx="10" strokeDasharray="6 4"
+        />
 
         {/* Route polyline (SCNA-09) */}
         {route && route.length > 1 && (
@@ -52,58 +50,71 @@ export default function CampusMap({
             strokeLinejoin="round"
           />
         )}
-        {/* Route endpoint dots */}
         {route && route.length > 1 && (
           <>
             <circle cx={route[0].x} cy={route[0].y} r="7" fill="#2563eb" stroke="#fff" strokeWidth="2" />
-            <circle cx={route[route.length - 1].x} cy={route[route.length - 1].y} r="7" fill={accessibilityMode ? '#16a34a' : '#2563eb'} stroke="#fff" strokeWidth="2" />
+            <circle
+              cx={route[route.length - 1].x}
+              cy={route[route.length - 1].y}
+              r="7"
+              fill={accessibilityMode ? '#16a34a' : '#2563eb'}
+              stroke="#fff"
+              strokeWidth="2"
+            />
           </>
         )}
 
-        {/* Building rectangles (SCNA-02) */}
+        {/* Building markers */}
         {buildings.map(b => {
           const isSelected = selectedBuilding?.id === b.id
-          const hasAccessIssue = accessibilityMode && (!b.accessibility.elevator || !b.accessibility.ramp)
+          // SCNA-14: amber dot = missing elevator or ramp; green dot = fully accessible
+          const hasAccessIssue =
+            accessibilityMode && (!b.accessibility.elevator || !b.accessibility.ramp)
+
           return (
             <g key={b.id} style={{ cursor: 'pointer' }} onClick={() => onSelectBuilding(b)}>
               <rect
-                x={b.mapX}
-                y={b.mapY}
-                width={b.width}
-                height={b.height}
+                x={b.mapX} y={b.mapY}
+                width={b.width} height={b.height}
                 fill={isSelected ? b.color : b.color + 'cc'}
                 stroke={isSelected ? '#1e293b' : b.color}
                 strokeWidth={isSelected ? 3 : 1.5}
                 rx="4"
-                filter={isSelected ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' : 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))'}
+                filter={
+                  isSelected
+                    ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                    : 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))'
+                }
               />
-              {/* Accessibility warning dot */}
+
+              {/* SCNA-14: Amber dot — limited accessibility */}
               {hasAccessIssue && (
-                <circle cx={b.mapX + b.width - 8} cy={b.mapY + 8} r="6" fill="#f59e0b" stroke="#fff" strokeWidth="1.5" />
+                <circle
+                  cx={b.mapX + b.width - 8} cy={b.mapY + 8}
+                  r="6" fill="#f59e0b" stroke="#fff" strokeWidth="1.5"
+                />
               )}
-              {/* Accessibility OK dot */}
+              {/* SCNA-14: Green dot — fully accessible */}
               {accessibilityMode && !hasAccessIssue && (
-                <circle cx={b.mapX + b.width - 8} cy={b.mapY + 8} r="6" fill="#16a34a" stroke="#fff" strokeWidth="1.5" />
+                <circle
+                  cx={b.mapX + b.width - 8} cy={b.mapY + 8}
+                  r="6" fill="#16a34a" stroke="#fff" strokeWidth="1.5"
+                />
               )}
+
               <text
                 x={b.mapX + b.width / 2}
                 y={b.mapY + b.height / 2 - 5}
-                textAnchor="middle"
-                fill="white"
-                fontSize="12"
-                fontWeight="700"
-                fontFamily="Space Mono, monospace"
+                textAnchor="middle" fill="white"
+                fontSize="12" fontWeight="700" fontFamily="Space Mono, monospace"
               >
                 {b.code}
               </text>
               <text
                 x={b.mapX + b.width / 2}
                 y={b.mapY + b.height / 2 + 10}
-                textAnchor="middle"
-                fill="white"
-                fontSize="8"
-                fontFamily="DM Sans, sans-serif"
-                opacity="0.9"
+                textAnchor="middle" fill="white"
+                fontSize="8" fontFamily="DM Sans, sans-serif" opacity="0.9"
               >
                 {b.floors}F
               </text>
@@ -112,21 +123,23 @@ export default function CampusMap({
         })}
 
         {/* Transit stops (SCNA-16) */}
-        {showTransit && transitStops.map(ts => (
-          <g key={ts.id}>
-            <circle cx={ts.mapX} cy={ts.mapY} r="10" fill="#dc2626" stroke="#fff" strokeWidth="2" />
-            <text x={ts.mapX} y={ts.mapY + 4} textAnchor="middle" fill="white" fontSize="10" fontWeight="700">T</text>
-            <text x={ts.mapX + 14} y={ts.mapY + 4} fill="#1e293b" fontSize="8" fontFamily="DM Sans, sans-serif">{ts.name.split('(')[0].trim()}</text>
-          </g>
-        ))}
+        {showTransit &&
+          transitStops.map(ts => (
+            <g key={ts.id}>
+              <circle cx={ts.mapX} cy={ts.mapY} r="10" fill="#dc2626" stroke="#fff" strokeWidth="2" />
+              <text x={ts.mapX} y={ts.mapY + 4} textAnchor="middle" fill="white" fontSize="10" fontWeight="700">T</text>
+              <text x={ts.mapX + 14} y={ts.mapY + 4} fill="#1e293b" fontSize="8" fontFamily="DM Sans, sans-serif">
+                {ts.name.split('(')[0].trim()}
+              </text>
+            </g>
+          ))}
 
-        {/* Compass */}
         <g transform="translate(575, 415)">
           <text textAnchor="middle" fontSize="10" fill="#64748b" fontWeight="700" fontFamily="Space Mono">N↑</text>
         </g>
-
-        {/* Legend label */}
-        <text x="40" y="420" fontSize="8" fill="#64748b" fontFamily="DM Sans">University of Calgary — Mock Campus Map</text>
+        <text x="40" y="420" fontSize="8" fill="#64748b" fontFamily="DM Sans">
+          University of Calgary — Mock Campus Map
+        </text>
       </svg>
     </div>
   )
