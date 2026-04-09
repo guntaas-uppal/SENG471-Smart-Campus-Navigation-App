@@ -3,6 +3,7 @@
 //          Green dot = available, Red dot = not available
 //          Full accessible route text shown when accessibilityMode is active
 // SCRUM-26: Display Building Hours and Type Badge in Building Panel
+// SCRUM-28: Add Accessible Washroom Locations to Building Panel
 
 
 export default function BuildingPanel({
@@ -17,13 +18,11 @@ export default function BuildingPanel({
 
   const acc = building.accessibility
 
-  // SCRUM-26: simple open/closed heuristic based on hours string
-  // e.g. "Mon-Fri 7:30am-10pm" → open hour = 7, checks current weekday + hour
   function isOpenNow() {
-    const now = new Date()
-    const day  = now.getDay()          // 0 = Sun, 6 = Sat
-    if (day === 0 || day === 6) return false   // weekend closed (simplistic)
-    const hour = now.getHours()
+    const now   = new Date()
+    const day   = now.getDay()
+    if (day === 0 || day === 6) return false
+    const hour  = now.getHours()
     const match = building.hours.match(/(\d+)(?::(\d+))?(am|pm)/i)
     if (!match) return true
     let openHour = parseInt(match[1])
@@ -43,7 +42,6 @@ export default function BuildingPanel({
         </div>
         <div className="panel-badges-row">
           <span className="panel-type-badge">{building.type}</span>
-          {/* SCRUM-26: open/closed status badge */}
           <span className={`open-badge ${open ? 'open' : 'closed'}`}>
             {open ? '● Open Now' : '● Closed'}
           </span>
@@ -60,12 +58,10 @@ export default function BuildingPanel({
           </div>
           <div className="info-item">
             <span className="info-label">Hours</span>
-            {/* SCRUM-26: hours string displayed here */}
             <span className="info-value hours">{building.hours}</span>
           </div>
         </div>
 
-        {/* Accessibility block */}
         <div className={`accessibility-block ${accessibilityMode ? 'active' : ''}`}>
           <span className="acc-label">Accessibility</span>
           <div className="acc-icons">
@@ -77,7 +73,10 @@ export default function BuildingPanel({
             </span>
             <span className={`acc-icon ${acc.accessibleWashroom ? 'yes' : 'no'}`}>
               {acc.accessibleWashroom ? '🚻' : '🚫'} Accessible WR
-              {/* SCRUM-28 adds floor tag here */}
+              {/* SCRUM-28: show floor number badge when washroom exists */}
+              {acc.accessibleWashroom && acc.accessibleWashroomFloor !== null && (
+                <span className="acc-floor-tag">Fl {acc.accessibleWashroomFloor}</span>
+              )}
             </span>
           </div>
           {accessibilityMode && (
@@ -88,7 +87,6 @@ export default function BuildingPanel({
           )}
         </div>
 
-        {/* Classrooms */}
         <div className="classrooms-section">
           <h3 className="section-label">Rooms &amp; Classrooms</h3>
           <ul className="classroom-list">
