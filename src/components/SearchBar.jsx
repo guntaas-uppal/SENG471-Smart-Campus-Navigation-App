@@ -12,14 +12,20 @@ export default function SearchBar({ buildings, onSelect }) {
     const q = query.toLowerCase()
     const matches = []
     buildings.forEach(b => {
+      // Match building by name or code
       if (b.name.toLowerCase().includes(q) || b.code.toLowerCase().includes(q)) {
-        matches.push({ type: 'building', building: b, label: `${b.code} — ${b.name}`, sub: b.type })
+        matches.push({
+          type: 'building', building: b,
+          label: `${b.code} — ${b.name}`, sub: b.type,
+        })
       }
+      // SCRUM-24: match classroom by name or type
       b.classrooms.forEach(c => {
         if (c.name.toLowerCase().includes(q) || c.type.toLowerCase().includes(q)) {
           matches.push({
             type: 'classroom', building: b, classroom: c,
-            label: c.name, sub: `${c.type} · Floor ${c.floor} · ${b.code}`,
+            label: c.name,
+            sub: `${c.type} · Floor ${c.floor} · ${b.code}`,
           })
         }
       })
@@ -36,6 +42,7 @@ export default function SearchBar({ buildings, onSelect }) {
   }, [])
 
   function handleSelect(result) {
+    // Pass classroom as second arg so App can set selectedClassroom
     onSelect(result.building, result.classroom || null)
     setQuery(result.label)
     setOpen(false)
@@ -55,20 +62,29 @@ export default function SearchBar({ buildings, onSelect }) {
           autoComplete="off"
         />
         {query && (
-          <button className="search-clear" onClick={() => { setQuery(''); setOpen(false) }} aria-label="Clear">✕</button>
+          <button
+            className="search-clear"
+            onClick={() => { setQuery(''); setOpen(false) }}
+            aria-label="Clear search"
+          >✕</button>
         )}
       </div>
+
       {open && results.length > 0 && (
         <ul className="search-dropdown">
           {results.map((r, i) => (
             <li key={i} className="search-result" onMouseDown={() => handleSelect(r)}>
-              <span className={`result-badge ${r.type}`}>{r.type === 'building' ? 'BLDG' : 'ROOM'}</span>
+              {/* SCRUM-24: green ROOM badge for classroom results */}
+              <span className={`result-badge ${r.type}`}>
+                {r.type === 'building' ? 'BLDG' : 'ROOM'}
+              </span>
               <span className="result-label">{r.label}</span>
               <span className="result-sub">{r.sub}</span>
             </li>
           ))}
         </ul>
       )}
+
       {open && query.trim().length > 0 && results.length === 0 && (
         <div className="search-empty">No results for "{query}"</div>
       )}
