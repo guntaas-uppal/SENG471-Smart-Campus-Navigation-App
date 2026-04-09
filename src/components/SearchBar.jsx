@@ -1,12 +1,13 @@
 // SCNA-05, SCNA-06: Search bar with real-time filtered results dropdown
+// SCRUM-24: Add Classroom Search — Search Rooms, Labs, and Offices
+
 import { useState, useRef, useEffect } from 'react'
 
 export default function SearchBar({ buildings, onSelect }) {
   const [query, setQuery] = useState('')
-  const [open, setOpen] = useState(false)
+  const [open,  setOpen]  = useState(false)
   const ref = useRef(null)
 
-  // Filter buildings and classrooms by name or code
   const results = query.trim().length === 0 ? [] : (() => {
     const q = query.toLowerCase()
     const matches = []
@@ -16,14 +17,16 @@ export default function SearchBar({ buildings, onSelect }) {
       }
       b.classrooms.forEach(c => {
         if (c.name.toLowerCase().includes(q) || c.type.toLowerCase().includes(q)) {
-          matches.push({ type: 'classroom', building: b, classroom: c, label: c.name, sub: `${c.type} · Floor ${c.floor} · ${b.code}` })
+          matches.push({
+            type: 'classroom', building: b, classroom: c,
+            label: c.name, sub: `${c.type} · Floor ${c.floor} · ${b.code}`,
+          })
         }
       })
     })
     return matches.slice(0, 8)
   })()
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClick(e) {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false)
@@ -52,7 +55,7 @@ export default function SearchBar({ buildings, onSelect }) {
           autoComplete="off"
         />
         {query && (
-          <button className="search-clear" onClick={() => { setQuery(''); setOpen(false) }}>✕</button>
+          <button className="search-clear" onClick={() => { setQuery(''); setOpen(false) }} aria-label="Clear">✕</button>
         )}
       </div>
       {open && results.length > 0 && (
