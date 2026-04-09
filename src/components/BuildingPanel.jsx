@@ -4,14 +4,14 @@
 //          Full accessible route text shown when accessibilityMode is active
 // SCRUM-26: Display Building Hours and Type Badge in Building Panel
 // SCRUM-28: Add Accessible Washroom Locations to Building Panel
-
+// SCRUM-29: Add "Get Directions To Here" Button in Building Panel
 
 export default function BuildingPanel({
   building,
   selectedClassroom,
   accessibilityMode,
   onShowFloor,
-  onGetDirections,
+  onGetDirections,   // ← SCRUM-29: called when button clicked
   onClose,
 }) {
   if (!building) return null
@@ -73,7 +73,6 @@ export default function BuildingPanel({
             </span>
             <span className={`acc-icon ${acc.accessibleWashroom ? 'yes' : 'no'}`}>
               {acc.accessibleWashroom ? '🚻' : '🚫'} Accessible WR
-              {/* SCRUM-28: show floor number badge when washroom exists */}
               {acc.accessibleWashroom && acc.accessibleWashroomFloor !== null && (
                 <span className="acc-floor-tag">Fl {acc.accessibleWashroomFloor}</span>
               )}
@@ -104,7 +103,15 @@ export default function BuildingPanel({
           <button className="btn btn-secondary full-width" onClick={() => onShowFloor(building)}>
             View Floor Plan
           </button>
-          {/* SCRUM-29 adds Get Directions To Here button here */}
+          {/* SCRUM-29: pre-fill NavigationPanel destination with this building */}
+          {onGetDirections && (
+            <button
+              className="btn btn-primary full-width"
+              onClick={() => onGetDirections(building)}
+            >
+              Get Directions To Here
+            </button>
+          )}
         </div>
       </div>
     </div>
