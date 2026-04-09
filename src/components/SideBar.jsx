@@ -1,6 +1,7 @@
 // Sidebar: contains search bar, accessibility toggle, building panel, and navigation panel
-import SearchBar from './SearchBar'
-import BuildingPanel from './BuildingPanel'
+
+import SearchBar       from './SearchBar'
+import BuildingPanel   from './BuildingPanel'
 import NavigationPanel from './NavigationPanel'
 
 export default function Sidebar({
@@ -9,16 +10,17 @@ export default function Sidebar({
   selectedClassroom,
   accessibilityMode,
   showTransit,
+  prefillDestination,
   onSelectBuilding,
   onToggleAccessibility,
   onToggleTransit,
   onShowFloor,
+  onGetDirections,
   onRouteChange,
   onClearBuilding,
 }) {
   return (
     <aside className="sidebar">
-      {/* App header */}
       <div className="sidebar-header">
         <div className="app-logo">
           <span className="logo-icon">🧭</span>
@@ -29,7 +31,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Search (SCNA-05, SCNA-06) */}
+      {/* Search */}
       <div className="sidebar-section">
         <SearchBar
           buildings={buildings}
@@ -37,9 +39,8 @@ export default function Sidebar({
         />
       </div>
 
-      {/* Map toggle controls */}
+      {/* Map controls */}
       <div className="sidebar-section toggles-row">
-        {/* Accessibility toggle (SCNA-13) */}
         <button
           className={`toggle-btn ${accessibilityMode ? 'active-green' : ''}`}
           onClick={onToggleAccessibility}
@@ -47,8 +48,6 @@ export default function Sidebar({
         >
           ♿ {accessibilityMode ? 'Accessible ON' : 'Accessible'}
         </button>
-
-        {/* Transit toggle (SCNA-16) */}
         <button
           className={`toggle-btn ${showTransit ? 'active-red' : ''}`}
           onClick={onToggleTransit}
@@ -58,7 +57,7 @@ export default function Sidebar({
         </button>
       </div>
 
-      {/* Building info panel (SCNA-07) — shown when a building is selected */}
+      {/* SCRUM-19: BuildingPanel — shown only when a building is selected */}
       {selectedBuilding && (
         <div className="sidebar-section">
           <BuildingPanel
@@ -66,22 +65,24 @@ export default function Sidebar({
             selectedClassroom={selectedClassroom}
             accessibilityMode={accessibilityMode}
             onShowFloor={onShowFloor}
+            onGetDirections={onGetDirections}
             onClose={onClearBuilding}
           />
         </div>
       )}
 
-      {/* Navigation panel (SCNA-08) */}
+      {/* Navigation panel */}
       <div className="sidebar-section">
         <NavigationPanel
           buildings={buildings}
           accessibilityMode={accessibilityMode}
           onRouteChange={onRouteChange}
+          prefillDestination={prefillDestination}
         />
       </div>
 
       <div className="sidebar-footer">
-        SENG 471 — Group 1 — Sprint 1 Prototype
+        SENG 471 — Group 1 — Sprint 2 Prototype
       </div>
     </aside>
   )
