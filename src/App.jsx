@@ -8,13 +8,15 @@
 //   - handleSelectBuilding, handleClearBuilding, handleShowFloor,
 //     handleGetDirections callbacks passed down as props
 // ─────────────────────────────────────────────────────────────────────────────
+// SCRUM-30: Add Mobile Responsive Sidebar Collapse Toggle
+
 
 import { useState } from 'react'
 import buildings from './data/buildings'
-import Sidebar        from './components/SideBar'
-import CampusMap      from './components/CampusMap'
-import FloorPlan      from './components/FloorPlan'
-import FloorSelector  from './components/FloorSelector'
+import Sidebar       from './components/SideBar'
+import CampusMap     from './components/CampusMap'
+import FloorPlan     from './components/FloorPlan'
+import FloorSelector from './components/FloorSelector'
 import './App.css'
 
 export default function App() {
@@ -25,6 +27,7 @@ export default function App() {
   const [showTransit,       setShowTransit]       = useState(false)
   const [showFloor,         setShowFloor]         = useState(false)
   const [activeFloor,       setActiveFloor]       = useState(1)
+  // SCRUM-30: controls sidebar open/closed on mobile
   const [sidebarOpen,       setSidebarOpen]       = useState(true)
   const [prefillDest,       setPrefillDest]       = useState('')
 
@@ -47,16 +50,19 @@ export default function App() {
     setActiveFloor(1)
   }
 
-  // Pre-fills NavigationPanel destination — triggered from BuildingPanel
   function handleGetDirections(building) {
     setPrefillDest(building.id)
+    // SCRUM-30: on mobile, scroll nav panel into view after pre-filling
     const navPanel = document.querySelector('.nav-panel')
     if (navPanel) navPanel.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
     <div className="app-root">
-      {/* Mobile sidebar toggle button (SCRUM-30) */}
+
+      {/* SCRUM-30: hamburger button — hidden on desktop, visible on mobile (<768px)
+          CSS in App.css: .mobile-sidebar-toggle { display: none }
+          @media (max-width:768px): display: flex                              */}
       <button
         className="mobile-sidebar-toggle"
         onClick={() => setSidebarOpen(o => !o)}
@@ -65,7 +71,8 @@ export default function App() {
         {sidebarOpen ? '✕' : '☰'}
       </button>
 
-      {/* ── Sidebar ── */}
+      {/* SCRUM-30: sidebar-wrapper gets 'closed' class when sidebarOpen=false
+          CSS: .sidebar-wrapper.closed → display:none on mobile               */}
       <div className={`sidebar-wrapper ${sidebarOpen ? 'open' : 'closed'}`}>
         <Sidebar
           buildings={buildings}
@@ -84,9 +91,7 @@ export default function App() {
         />
       </div>
 
-      {/* ── Map area ── */}
       <main className="map-wrapper">
-        {/* Accessibility banner — rendered by SCRUM-21 toggle */}
         {accessibilityMode && (
           <div className="accessibility-banner">
             ♿ Accessibility Mode Active — Showing accessible routes and building features
@@ -102,7 +107,6 @@ export default function App() {
           showTransit={showTransit}
         />
 
-        {/* ── Floor plan modal overlay (SCRUM-11/12) ── */}
         {showFloor && selectedBuilding && (
           <div
             className="floor-modal-overlay"
