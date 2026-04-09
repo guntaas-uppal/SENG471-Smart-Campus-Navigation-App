@@ -1,35 +1,42 @@
 // SCNA-08: Step-by-step navigation mock panel
 // SCNA-09: Triggers route polyline on map via onRouteChange prop
 // User selects origin + destination; app draws route and shows directions list.
+// SCRUM-27: Add Step-by-Step Navigation for All Building Pairs
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { mockRoutes } from '../data/buildings'
 
-export default function NavigationPanel({ buildings, accessibilityMode, onRouteChange }) {
-  const [origin, setOrigin] = useState('')
+export default function NavigationPanel({
+  buildings,
+  accessibilityMode,
+  onRouteChange,
+  prefillDestination,
+}) {
+  const [origin,      setOrigin]      = useState('')
   const [destination, setDestination] = useState('')
-  const [steps, setSteps] = useState([])
-  const [noRoute, setNoRoute] = useState(false)
+  const [steps,       setSteps]       = useState([])
+  const [noRoute,     setNoRoute]     = useState(false)
+
+  // SCRUM-29: auto-fill destination when triggered from BuildingPanel
+  useEffect(() => {
+    if (prefillDestination) setDestination(prefillDestination)
+  }, [prefillDestination])
 
   function handleNavigate() {
     if (!origin || !destination || origin === destination) return
 
-    // Look up pre-defined route in both directions
     const key1 = `${origin}-${destination}`
     const key2 = `${destination}-${origin}`
     const routeData = mockRoutes[key1] || mockRoutes[key2]
 
     if (routeData) {
       const waypoints = accessibilityMode ? routeData.accessible : routeData.standard
-      const dirSteps = accessibilityMode
-        ? routeData.steps.accessible
-        : routeData.steps.standard
+      const dirSteps  = accessibilityMode ? routeData.steps.accessible : routeData.steps.standard
       setSteps(dirSteps)
       setNoRoute(false)
-      // Pass waypoints up to App → CampusMap to draw polyline (SCNA-09)
       onRouteChange(waypoints)
     } else {
-      // Generic directions for pairs without a pre-mapped route
+      // Generic fallback for pairs without a pre-mapped route
       const o = buildings.find(b => b.id === origin)
       const d = buildings.find(b => b.id === destination)
       const genericSteps = accessibilityMode
@@ -47,7 +54,7 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
           ]
       setSteps(genericSteps)
       setNoRoute(true)
-      onRouteChange([]) // No pre-mapped waypoints for this pair
+      onRouteChange([])
     }
   }
 
@@ -56,7 +63,7 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
     setDestination('')
     setSteps([])
     setNoRoute(false)
-    onRouteChange([]) // Clear polyline from map
+    onRouteChange([])
   }
 
   return (
@@ -66,32 +73,19 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
       <div className="nav-selects">
         <div className="select-group">
           <label className="select-label">From</label>
-          <select
-            className="nav-select"
-            value={origin}
-            onChange={e => setOrigin(e.target.value)}
-          >
+          <select className="nav-select" value={origin} onChange={e => setOrigin(e.target.value)}>
             <option value="">Select starting building...</option>
             {buildings.map(b => (
-              <option key={b.id} value={b.id}>
-                {b.code} — {b.name}
-              </option>
+              <option key={b.id} value={b.id}>{b.code} — {b.name}</option>
             ))}
           </select>
         </div>
-
         <div className="select-group">
           <label className="select-label">To</label>
-          <select
-            className="nav-select"
-            value={destination}
-            onChange={e => setDestination(e.target.value)}
-          >
+          <select className="nav-select" value={destination} onChange={e => setDestination(e.target.value)}>
             <option value="">Select destination...</option>
             {buildings.map(b => (
-              <option key={b.id} value={b.id}>
-                {b.code} — {b.name}
-              </option>
+              <option key={b.id} value={b.id}>{b.code} — {b.name}</option>
             ))}
           </select>
         </div>
@@ -112,9 +106,7 @@ export default function NavigationPanel({ buildings, accessibilityMode, onRouteC
           Get Directions
         </button>
         {steps.length > 0 && (
-          <button className="btn btn-ghost" onClick={handleClear}>
-            Clear
-          </button>
+          <button className="btn btn-ghost" onClick={handleClear}>Clear</button>
         )}
       </div>
 
