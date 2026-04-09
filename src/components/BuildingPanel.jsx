@@ -2,6 +2,8 @@
 // SCNA-14: Accessibility icons — elevator, ramp, accessible washroom
 //          Green dot = available, Red dot = not available
 //          Full accessible route text shown when accessibilityMode is active
+// SCRUM-26: Display Building Hours and Type Badge in Building Panel
+
 
 export default function BuildingPanel({
   building,
@@ -15,6 +17,22 @@ export default function BuildingPanel({
 
   const acc = building.accessibility
 
+  // SCRUM-26: simple open/closed heuristic based on hours string
+  // e.g. "Mon-Fri 7:30am-10pm" → open hour = 7, checks current weekday + hour
+  function isOpenNow() {
+    const now = new Date()
+    const day  = now.getDay()          // 0 = Sun, 6 = Sat
+    if (day === 0 || day === 6) return false   // weekend closed (simplistic)
+    const hour = now.getHours()
+    const match = building.hours.match(/(\d+)(?::(\d+))?(am|pm)/i)
+    if (!match) return true
+    let openHour = parseInt(match[1])
+    if (match[3].toLowerCase() === 'pm' && openHour !== 12) openHour += 12
+    return hour >= openHour && hour < 22
+  }
+
+  const open = isOpenNow()
+
   return (
     <div className="panel building-panel">
       <div className="panel-header">
@@ -25,7 +43,10 @@ export default function BuildingPanel({
         </div>
         <div className="panel-badges-row">
           <span className="panel-type-badge">{building.type}</span>
-          {/* open/closed badge placeholder — SCRUM-26 adds logic here */}
+          {/* SCRUM-26: open/closed status badge */}
+          <span className={`open-badge ${open ? 'open' : 'closed'}`}>
+            {open ? '● Open Now' : '● Closed'}
+          </span>
         </div>
       </div>
 
@@ -39,6 +60,7 @@ export default function BuildingPanel({
           </div>
           <div className="info-item">
             <span className="info-label">Hours</span>
+            {/* SCRUM-26: hours string displayed here */}
             <span className="info-value hours">{building.hours}</span>
           </div>
         </div>
